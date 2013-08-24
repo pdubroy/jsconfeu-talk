@@ -1,0 +1,8 @@
+expr
+  = number
+  / '(' expr ')' 
+  / left:expr '+' right:expr
+  / left:expr '*' right:expr
+
+number
+  = digits:[0-9]+
