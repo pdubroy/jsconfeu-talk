@@ -25,16 +25,17 @@ checkStyle = (code, filename) ->
     enter: (node, parent) ->
       if checks[node.type]
         errors = errors.concat checks[node.type](node, parent)
-  reportErrors(code, errors, filename)
+  formatErrors(code, errors, filename)
 
-# Handles error reporting by printing a human-readable string to the console.
-reportErrors = (code, errors, filename) ->
-  _.each errors, (e) ->
+# Takes a list of errors found by `checkStyle`, and returns a list of
+# human-readable error messages.
+formatErrors = (code, errors, filename) ->
+  _.map errors, (e) ->
     loc = e.location.start
     prefix =
       if filename? "#{ filename }:#{ loc.line }:#{ loc.column }"
       else "Line #{ loc.line }, column #{ loc.column }"
-    console.log "#{ prefix }: #{ e.message }"
+    "#{ prefix }: #{ e.message }"
 
 # Specifies the parse options for the Esprima parser.
 parseOptions =
@@ -42,7 +43,7 @@ parseOptions =
   range: true  # Nodes have an index-based location range (array)
 
 # A quick test to make sure things work.
-checkStyle """
+console.log checkStyle """
 var foo = bar;
 var this_is_bad = 3;
 function blah() {
