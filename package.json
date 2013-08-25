@@ -1,10 +1,11 @@
 {
-	"name": "jsconfeu",
+	"name": "jsconfeu-talk",
 	"author": "Patrick Dubroy <pdubroy@gmail.com>",
 	"dependencies": {
+		"escodegen": ">= 0.0.26",
 		"esprima": ">= 1.0.3",
 		"estraverse": ">= 1.3.0",
-	  "underscore": ">= 1.5.1"
+		"underscore": ">= 1.5.1"
 	},
 	"version": "0.1.0"
 }
