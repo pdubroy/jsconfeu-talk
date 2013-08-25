@@ -1,0 +1,10 @@
+{
+	"name": "jsconfeu",
+	"author": "Patrick Dubroy <pdubroy@gmail.com>",
+	"dependencies": {
+		"esprima": ">= 1.0.3",
+		"estraverse": ">= 1.3.0",
+	  "underscore": ">= 1.5.1"
+	},
+	"version": "0.1.0"
+}
