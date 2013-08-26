@@ -13,12 +13,21 @@ addLogging = (code) ->
   estraverse.traverse ast,
     leave: (node, parent) ->
       if node.type == 'FunctionDeclaration' or node.type == 'FunctionExpression'
-        transformFunction node
-  escodegen.generate ast
+        wrapFunctionBody(node, getBeforeCode node, getAfterCode node)
+  prelude = "var _ = require('underscore'), describeArgs = #{ describeArgs.toString() };"
+  prelude + escodegen.generate ast
 
-transformFunction = (node) ->
+# Return a string with the code to insert at the beginning of the function
+# represented by `node`.
+getBeforeCode = (node) ->
   name = if node.id? then node.id.name else '<anonymous function>'
-  wrapFunctionBody(node, "console.log('Entering #{ name }()');")
+  paramNames = ("'#{ x }'" for x in _.pluck(node.params, 'name')).join ', '
+  describeArgs = "describeArgs([#{ paramNames }], arguments)"
+  "console.log('Entering #{ name }(' + #{ describeArgs } + ')');"
+
+# Return a string with the code to insert at the end of the function
+# represented by `node`.
+getAfterCode = (node) -> ''
 
 # Take a FunctionDeclaration or FunctionExpression node, and wrap its body
 # with `beforeCode` and `afterCode`.
@@ -27,11 +36,20 @@ wrapFunctionBody = (node, beforeCode, afterCode) ->
   afterNodes = if afterCode? then parse(afterCode).body else []
   node.body.body = beforeNodes.concat(node.body.body, afterNodes)
 
+# Returns a string describing the actual argument values that were passed to
+# a function.
+describeArgs = (parameterNames, values) ->
+  names = ("#{ name }=" for name in parameterNames)
+  formatValue = (v) -> if typeof(v) == 'string' then "'#{ v }'" else v
+  ("#{ name ? '' }#{ formatValue(val) }" for [name, val] in _.zip(names, values)).join(', ')
+
 console.log addLogging """
-function foo() {
+function foo(a, b) {
     var x = 'blah';
-    var y = function () {
+    var y = (function () {
         return 3;
-    };
+    })();
 }
+foo(1, 'wut', 3)
 """
+
