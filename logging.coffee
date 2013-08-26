@@ -12,7 +12,7 @@ addLogging = (code) ->
   ast = parse code
   estraverse.traverse ast,
     leave: (node, parent) ->
-      if node.type == 'FunctionDeclaration' or node.type == 'FunctionExpression'
+      if node.type in ['FunctionDeclaration', 'FunctionExpression']
         wrapFunctionBody(node, getBeforeCode node, getAfterCode node)
   prelude = "var _ = require('underscore'), describeArgs = #{ describeArgs.toString() };"
   prelude + escodegen.generate ast
@@ -20,7 +20,7 @@ addLogging = (code) ->
 # Return a string with the code to insert at the beginning of the function
 # represented by `node`.
 getBeforeCode = (node) ->
-  name = if node.id? then node.id.name else '<anonymous function>'
+  name = node?.id?.name ? '<anonymous function>'
   paramNames = ("'#{ x }'" for x in _.pluck(node.params, 'name')).join ', '
   describeArgs = "describeArgs([#{ paramNames }], arguments)"
   "console.log('Entering #{ name }(' + #{ describeArgs } + ')');"
