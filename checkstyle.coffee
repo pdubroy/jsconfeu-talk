@@ -1,21 +1,8 @@
 # A simple JavaScript style checker.
 
+_ = require 'underscore'
 esprima = require 'esprima'
 estraverse = require 'estraverse'
-_ = require 'underscore'
-
-# Style checks to perform for the various node types.
-# Each checking function returns an Array of errors, where each error is an
-# object with properties 'location' and 'message'.
-checks =
-  VariableDeclaration: (node) ->
-    errors = _.map node.declarations, (decl) ->
-      # Disallow hacker_style variable names.
-      if decl.id.name.indexOf('_') >= 0
-        return err =
-          location: decl.loc
-          message: 'Use camelCase for variable names, not hacker_style.'
-    _.compact errors
 
 # Performs style checks on `code` and reports any errors that are found.
 checkStyle = (code, filename) ->
@@ -23,9 +10,18 @@ checkStyle = (code, filename) ->
   errors = []
   estraverse.traverse ast,
     enter: (node, parent) ->
-      if checks[node.type]
-        errors = errors.concat checks[node.type](node, parent)
+      if node.type == 'VariableDeclaration'
+        checkVariableNames(node, errors)
   formatErrors(code, errors, filename)
+
+# Checks that all variable names in a VariableDeclaration node are
+# in camelCase, not hacker_style.
+checkVariableNames = (node, errors) ->
+  _.each node.declarations, (decl) ->
+    if decl.id.name.indexOf('_') >= 0
+      errors.push
+        location: decl.loc
+        message: 'Use camelCase for variable names, not hacker_style.'
 
 # Takes a list of errors found by `checkStyle`, and returns a list of
 # human-readable error messages.
