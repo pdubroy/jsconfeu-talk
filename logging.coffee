@@ -6,34 +6,28 @@ esprima = require 'esprima'
 estraverse = require 'estraverse'
 _ = require 'underscore'
 
-parse = esprima.parse
-
 addLogging = (code) ->
-  ast = parse code
+  ast = esprima.parse code
   estraverse.traverse ast,
     leave: (node, parent) ->
       if node.type in ['FunctionDeclaration', 'FunctionExpression']
-        wrapFunctionBody(node, getBeforeCode node, getAfterCode node)
+        wrapFunctionBody(node, getBeforeCode(node))
   prelude = "var _ = require('underscore'), describeArgs = #{ describeArgs.toString() };"
   prelude + escodegen.generate ast
 
 # Return a string with the code to insert at the beginning of the function
 # represented by `node`.
 getBeforeCode = (node) ->
-  name = node?.id?.name ? '<anonymous function>'
-  paramNames = ("'#{ x }'" for x in _.pluck(node.params, 'name')).join ', '
+  name = if node.id then node.id.name else '<anonymous function>'
+  paramNames = _.map(node.params, (p) -> "'#{ p.name }'").join ', '
   describeArgs = "describeArgs([#{ paramNames }], arguments)"
   "console.log('Entering #{ name }(' + #{ describeArgs } + ')');"
-
-# Return a string with the code to insert at the end of the function
-# represented by `node`.
-getAfterCode = (node) -> ''
 
 # Take a FunctionDeclaration or FunctionExpression node, and wrap its body
 # with `beforeCode` and `afterCode`.
 wrapFunctionBody = (node, beforeCode, afterCode) ->
-  beforeNodes = if beforeCode? then parse(beforeCode).body else []
-  afterNodes = if afterCode? then parse(afterCode).body else []
+  beforeNodes = if beforeCode? then esprima.parse(beforeCode).body else []
+  afterNodes = if afterCode? then esprima.parse(afterCode).body else []
   node.body.body = beforeNodes.concat(node.body.body, afterNodes)
 
 # Returns a string describing the actual argument values that were passed to
