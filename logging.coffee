@@ -33,9 +33,11 @@ wrapFunctionBody = (node, beforeCode, afterCode) ->
 # Returns a string describing the actual argument values that were passed to
 # a function.
 describeArgs = (parameterNames, values) ->
-  names = ("#{ name }=" for name in parameterNames)
-  formatValue = (v) -> if typeof(v) == 'string' then "'#{ v }'" else v
-  ("#{ name ? '' }#{ formatValue(val) }" for [name, val] in _.zip(names, values)).join(', ')
+  names = _.map(parameterNames, (name) -> "#{ name }=")
+  formatValue = (v) -> if _.isString(v) then "'#{ v }'" else v
+  _.map(_.zip(names, values), (each) ->
+    "#{ each[0] ? '' }#{ formatValue(each[1]) }"
+  ).join(', ')
 
 console.log addLogging """
 function foo(a, b) {
