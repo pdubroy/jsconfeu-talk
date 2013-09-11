@@ -8,7 +8,7 @@ function checkStyle(code, filename) {
   estraverse.traverse(ast, {
     enter: function(node, parent) {
       if (node.type === 'VariableDeclaration')
-        return checkVariableNames(node, errors);
+        checkVariableNames(node, errors);
     }
   });
   return formatErrors(code, errors, filename);
