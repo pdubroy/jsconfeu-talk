@@ -40,4 +40,11 @@ var parseOptions = {
   range: true
 };
 
-console.log(checkStyle("var foo = bar;\nvar this_is_bad = 3;\nfunction blah() {\n  return function x() { var oops_another_one; }\n}"));
+console.log(checkStyle("   \
+var foo = bar;             \
+var this_is_bad = 3;       \
+function blah() {          \
+  return function x() {    \
+    var oops_another_one;  \
+  }                        \
+}"));
