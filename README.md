@@ -15,8 +15,8 @@ the talk.
 
 ### PEG.js Example
 
-`altjs.coffee` is the code for the "AltJS language in 5 minutes" presented
-in the second half of the talk.
+`altjs.coffee` is the code for the "AltJS language in 5 minutes" section
+presented in the second half of the talk.
 
 ### Extra Special Bonus!
 
